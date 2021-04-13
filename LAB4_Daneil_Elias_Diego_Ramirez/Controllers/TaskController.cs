@@ -15,6 +15,7 @@ namespace LAB4_Daneil_Elias_Diego_Ramirez.Controllers
             return View();
         }
 
+
         // GET: TaskController/Details/5
         public ActionResult Details(int id)
         {
@@ -34,18 +35,22 @@ namespace LAB4_Daneil_Elias_Diego_Ramirez.Controllers
         {
             try
             {
-                var Task = new Models.Data.Task
+                var Task = new Models.Data.Task();
+                var Task2 = new Models.Data.Task(); 
+
                 {
-                    Title = collection["Title"],
-                    Description = collection["Description"],
-                    Project = collection["Project"],
-                    Priority = Convert.ToInt32(collection["Priority"]),
-                    Date = collection["Date"],
+                    Task.Title = collection["Title"];
+                    Task.Description = collection["Description"];
+                      Task.Project = collection["Project"];
+                    Task.Priority = Convert.ToInt32(collection["Priority"]);
+                    Task.Date = collection["Date"];
+                    Task2.Title = Task.Title;
                   
                 };
 
                 Singleton.Instance.TaskHashtable.Add(Task.Title, Task);
-               
+                Singleton.Instance.TaskIndex.insert(Task2, Task.Priority);
+                //ya (: 
 
                 return RedirectToAction(nameof(View));
             }
