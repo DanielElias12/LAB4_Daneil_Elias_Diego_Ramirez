@@ -50,7 +50,7 @@ namespace LAB4_Daneil_Elias_Diego_Ramirez
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Task}/{action=Index}/{id?}");
             });
         }
     }

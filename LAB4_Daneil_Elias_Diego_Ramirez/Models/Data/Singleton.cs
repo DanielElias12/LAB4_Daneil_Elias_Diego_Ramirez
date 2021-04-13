@@ -8,11 +8,15 @@ namespace LAB4_Daneil_Elias_Diego_Ramirez.Models.Data
     public sealed class Singleton
     {
         private readonly static Singleton _instance = new Singleton();
-      
+
+        public HashTable<Task> TaskHashtable;
+        public PriorityQueue<Task> TaskIndex;
         private Singleton()
         {
 
-          
+            TaskIndex = new PriorityQueue<Task>();
+            TaskHashtable = new HashTable<Task>(10);
+
 
         }
 
