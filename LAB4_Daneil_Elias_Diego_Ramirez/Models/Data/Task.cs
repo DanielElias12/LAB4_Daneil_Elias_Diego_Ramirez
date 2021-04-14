@@ -9,6 +9,9 @@ namespace LAB4_Daneil_Elias_Diego_Ramirez.Models.Data
     public class Task
     {
         [Required]
+        public string Developer { get; set; }
+
+        [Required]
         public string Title { get; set; }
 
         [Required]
