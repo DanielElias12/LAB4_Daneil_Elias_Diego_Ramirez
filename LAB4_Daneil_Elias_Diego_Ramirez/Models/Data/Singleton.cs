@@ -13,9 +13,10 @@ namespace LAB4_Daneil_Elias_Diego_Ramirez.Models.Data
         public PriorityQueue<Task> TaskIndex;
         public List<Developer> DevelopersList;
         public List<Task> VisibleTasks;
+        public MinHeap<Task> heap;
         private Singleton()
         {
-            
+            heap = new MinHeap<Task>();
             TaskIndex = new PriorityQueue<Task>();
             TaskHashtable = new HashTable<Task>(10);
             DevelopersList = new List<Developer>();
