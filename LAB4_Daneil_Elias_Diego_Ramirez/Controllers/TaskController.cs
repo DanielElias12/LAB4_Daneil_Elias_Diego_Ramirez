@@ -21,6 +21,7 @@ namespace LAB4_Daneil_Elias_Diego_Ramirez.Controllers
         public static string csvdevelopers = "";
         public static string csvTasksHash = "";
         public static bool firstread;
+        public static bool refreshAllTasks = true;
 
         
         public void ReadDevelopersList()
@@ -230,13 +231,49 @@ namespace LAB4_Daneil_Elias_Diego_Ramirez.Controllers
         {
             return View();
         }
-        public ActionResult ViewAllTasks()
+
+     
+        public ActionResult ViewAllTasks(string dev)
         {
-            return View(Singleton.Instance.VisibleTasks);
+            Singleton.Instance.VisibleTasks.Clear();
+            var heap = Singleton.Instance.heap;
+            var hashtable = Singleton.Instance.TaskHashtable;
+
+
+            for (int i = 0; i < heap.elements.Count; i++)
+            {
+                string key = heap.elements[i].Data.Title;
+                var newTask = new Models.Data.Task();
+                newTask = hashtable.GetNode(key);
+                Singleton.Instance.VisibleTasks.Add(newTask);
+
+            }
+            listPriority(Singleton.Instance.VisibleTasks);
+            
+            var User = from x in Singleton.Instance.VisibleTasks select x;
+            User = User.Where(x => x.Developer.Contains(currentDeveloper));
+
+            return View(User);
+            
         }
         public ActionResult GetCurrentTask()
         {
-            return View();
+            var heap = Singleton.Instance.heap;
+            var hashtable = Singleton.Instance.TaskHashtable;
+            var newTask = new Models.Data.Task();
+            for (int i = 0; i < heap.elements.Count;i++)
+            {
+                
+                if (heap.elements[i].Data.Developer == currentDeveloper)
+                {
+                    string key = heap.elements[i].Data.Title;
+                    
+                    newTask = hashtable.GetNode(key);
+                    break;
+                }
+               
+            }
+            return View(newTask);
         }
         // GET: TaskController/Create
         public ActionResult CreateTask()
@@ -253,6 +290,7 @@ namespace LAB4_Daneil_Elias_Diego_Ramirez.Controllers
             {
                 var Task = new Models.Data.Task();
                 var Task2 = new Models.Data.Task();
+                var node = new Models.Data.PriorityNode<Models.Data.Task>();
                 {
                     Task.Developer = currentDeveloper;
                     Task.Title = collection["Title"];
@@ -264,11 +302,14 @@ namespace LAB4_Daneil_Elias_Diego_Ramirez.Controllers
                     Task.Developer = currentDeveloper;
                   
                 };
+                node.Data = Task;
+                node.prioridad = Task.Priority;
                 WriteTasksHashtable(Task);
                 Singleton.Instance.TaskHashtable.Add(Task.Title, Task);
                 Singleton.Instance.TaskIndex.insert(Task2, Task.Priority);
-                //ya (: 
-
+                Singleton.Instance.heap.Add(node);
+                refreshAllTasks = true;
+              
                 return RedirectToAction(nameof(DeveloperTasks));
             }
             catch
@@ -284,49 +325,24 @@ namespace LAB4_Daneil_Elias_Diego_Ramirez.Controllers
             return View(Singleton.Instance.DevelopersList);
         }
 
-
-
-
-        // GET: TaskController/Edit/5
-        public ActionResult Edit(int id)
+        public void listPriority(List<Models.Data.Task> list)
         {
-            return View();
-        }
-
-        // POST: TaskController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
+            Models.Data.Task temp;
+            for (int i = 0; i < list.Count; i++)
             {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
+                for (int j = 0; j < list.Count - 1; j++)
+                {
+                    if (list[j].Priority > (list[j + 1].Priority))
+                    {
+                        temp = list[j];
+                        list[j] = list[j + 1];
+                        list[j + 1] = temp;
+                    }
+                }
             }
         }
 
-        // GET: TaskController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
 
-        // POST: TaskController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+
     }
 }

@@ -7,7 +7,7 @@ namespace LAB4_Daneil_Elias_Diego_Ramirez.Models.Data
 {
     public class MinHeap<T> 
     {
-        List<PriorityNode<T>> elements;
+        public List<PriorityNode<T>> elements;
         public MinHeap()
         {
             elements = new List<PriorityNode<T>>();
@@ -58,5 +58,12 @@ namespace LAB4_Daneil_Elias_Diego_Ramirez.Models.Data
                 }
             }
         }
+
+        public PriorityNode<T> GetMin()
+        {
+            PriorityNode<T> min = elements[0];
+            return min;
+        }
+
     }
 }
