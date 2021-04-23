@@ -78,6 +78,7 @@ namespace LAB4_Daneil_Elias_Diego_Ramirez.Controllers
                     {
                         fields = csvReader.ReadFields();
                         var newTask = new Models.Data.Task();
+                        var node = new Models.Data.PriorityNode<Models.Data.Task>();
 
                         newTask.Developer = fields[0];
                         newTask.Title = fields[1];
@@ -86,7 +87,11 @@ namespace LAB4_Daneil_Elias_Diego_Ramirez.Controllers
                         newTask.Priority = Convert.ToInt32(fields[4]);
                         newTask.Date = fields[5];
                         csvTasksHash += $"{fields[0]},{fields[1]},{fields[2]},{fields[3]},{fields[4]},{fields[5]}\n";
+
+                        node.Data = newTask;
+                        node.prioridad = newTask.Priority;
                         Singleton.Instance.TaskHashtable.Add(newTask.Title, newTask);
+                        Singleton.Instance.heap.Add(node);
 
                     }
                     catch
