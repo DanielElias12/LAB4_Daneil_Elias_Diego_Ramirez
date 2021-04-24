@@ -1,11 +1,12 @@
 ﻿@model LAB4_Daneil_Elias_Diego_Ramirez.Models.Data.Task
 
 @{
-    ViewData["Title"] = "GetCurrentTask";
+    ViewData["Title"] = "DeleteTask";
 }
 
-<h1>Current Task</h1>
+<h1>Delete task</h1>
 
+<h3>Are you sure you want to delete this?</h3>
 <div>
     <h4>Task</h4>
     <hr />
@@ -47,8 +48,9 @@
             @Html.DisplayFor(model => model.Date)
         </dd>
     </dl>
-</div>
-<div>
-    @Html.ActionLink("Delete Task", "DeleteTask", new { id = Model.Title }) |
-    <a asp-action="Index">Back to List</a>
+    
+    <form asp-action="DeleteTask">
+        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <a asp-action="DeveloperTasks">Back to Developer menu</a>
+    </form>
 </div>

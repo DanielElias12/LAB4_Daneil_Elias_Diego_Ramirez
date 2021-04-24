@@ -256,24 +256,53 @@ namespace LAB4_Daneil_Elias_Diego_Ramirez.Controllers
             return View(User);
             
         }
-        public ActionResult GetCurrentTask()
+        public ActionResult ViewTaskManager(string dev)
         {
+            ViewData["GetDev"] = dev; 
+            Singleton.Instance.VisibleTasks.Clear();
             var heap = Singleton.Instance.heap;
             var hashtable = Singleton.Instance.TaskHashtable;
-            var newTask = new Models.Data.Task();
+
+            var User = from x in Singleton.Instance.VisibleTasks select x;
+            if (!String.IsNullOrEmpty(dev))
+            {
+                for (int i = 0; i < heap.elements.Count; i++)
+                {
+                    string key = heap.elements[i].Data.Title;
+                    var newTask = new Models.Data.Task();
+                    newTask = hashtable.GetNode(key);
+                    Singleton.Instance.VisibleTasks.Add(newTask);
+
+                }
+                listPriority(Singleton.Instance.VisibleTasks);
+
+
+                User = User.Where(x => x.Developer.Contains(dev));
+            }
+            return View(User);
+
+        }
+        public ActionResult GetCurrentTask()
+        {
+            Singleton.Instance.VisibleTasks.Clear();
+            var heap = Singleton.Instance.heap;
+            var hashtable = Singleton.Instance.TaskHashtable;
+           
             for (int i = 0; i < heap.elements.Count;i++)
             {
-                
+               
+             
                 if (heap.elements[i].Data.Developer == currentDeveloper)
                 {
                     string key = heap.elements[i].Data.Title;
-                    
+                    var newTask = new Models.Data.Task();
                     newTask = hashtable.GetNode(key);
-                    break;
+                    Singleton.Instance.VisibleTasks.Add(newTask);
                 }
+                listPriority(Singleton.Instance.VisibleTasks);
                
             }
-            return View(newTask);
+            return View(Singleton.Instance.VisibleTasks[0]);
         }
         // GET: TaskController/Create
         public ActionResult CreateTask()
@@ -325,6 +354,61 @@ namespace LAB4_Daneil_Elias_Diego_Ramirez.Controllers
             return View(Singleton.Instance.DevelopersList);
         }
 
+        public ActionResult DeleteTask(string Title)
+        {
+
+            Singleton.Instance.VisibleTasks.Clear();
+            var heap = Singleton.Instance.heap;
+            var hashtable = Singleton.Instance.TaskHashtable;
+
+            for (int i = 0; i < heap.elements.Count; i++)
+            {
+
+
+                if (heap.elements[i].Data.Developer == currentDeveloper)
+                {
+                    string key = heap.elements[i].Data.Title;
+                    var newTask = new Models.Data.Task();
+                    newTask = hashtable.GetNode(key);
+                    Singleton.Instance.VisibleTasks.Add(newTask);
+                }
+                listPriority(Singleton.Instance.VisibleTasks);
+
+            }
+            return View(Singleton.Instance.VisibleTasks[0]);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteTask(string id, IFormCollection collection)
+        {
+            var heap = Singleton.Instance.heap;
+            var hashtable = Singleton.Instance.TaskHashtable;
+            var newTask = new Models.Data.Task();
+            try
+            {
+                for (int i = 0; i < heap.elements.Count; i++)
+                {
+
+                    if (heap.elements[i].Data.Title == id)
+                    {
+                        var node = new Models.Data.PriorityNode<Models.Data.Task>();
+                        node = heap.elements[i];
+
+                        string key = heap.elements[i].Data.Title;
+                        Singleton.Instance.heap.Delete(node);
+                        Singleton.Instance.TaskHashtable.Remove(key);
+
+
+                        break;
+                    }
+                }
+                return RedirectToAction(nameof(DeveloperTasks));
+            }
+            catch
+            {
+                return View();
+            }
+        }
         public void listPriority(List<Models.Data.Task> list)
         {
             Models.Data.Task temp;
