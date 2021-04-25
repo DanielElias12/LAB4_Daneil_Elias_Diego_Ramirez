@@ -22,6 +22,7 @@ namespace LAB4_Daneil_Elias_Diego_Ramirez.Controllers
         public static string csvTasksHash = "";
         public static bool firstread;
         public static bool refreshAllTasks = true;
+        public static bool deleted;
 
         
         public void ReadDevelopersList()
@@ -175,6 +176,7 @@ namespace LAB4_Daneil_Elias_Diego_Ramirez.Controllers
                 };
                 WriteDevelopersList(newDeveloper);
                 Singleton.Instance.DevelopersList.Add(newDeveloper);
+                Message("Account created succesfully, please log in");
 
                 return RedirectToAction(nameof(Index));
             }
@@ -217,6 +219,7 @@ namespace LAB4_Daneil_Elias_Diego_Ramirez.Controllers
 
             if (success)
             {
+                Message("logged in as " + currentDeveloper);
                 return RedirectToAction(nameof(DeveloperTasks)); ;
             }
             else
@@ -259,25 +262,42 @@ namespace LAB4_Daneil_Elias_Diego_Ramirez.Controllers
       
         public ActionResult GetCurrentTask()
         {
-            Singleton.Instance.VisibleTasks.Clear();
-            var heap = Singleton.Instance.heap;
-            var hashtable = Singleton.Instance.TaskHashtable;
-           
-            for (int i = 0; i < heap.elements.Count;i++)
+            try
             {
-               
-             
-                if (heap.elements[i].Data.Developer == currentDeveloper)
+
+
+                Singleton.Instance.VisibleTasks.Clear();
+                var heap = Singleton.Instance.heap;
+                var hashtable = Singleton.Instance.TaskHashtable;
+
+                for (int i = 0; i < heap.elements.Count; i++)
                 {
-                    string key = heap.elements[i].Data.Title;
-                    var newTask = new Models.Data.Task();
-                    newTask = hashtable.GetNode(key);
-                    Singleton.Instance.VisibleTasks.Add(newTask);
+
+
+                    if (heap.elements[i].Data.Developer == currentDeveloper)
+                    {
+                        string key = heap.elements[i].Data.Title;
+                        var newTask = new Models.Data.Task();
+                        newTask = hashtable.GetNode(key);
+                        Singleton.Instance.VisibleTasks.Add(newTask);
+                    }
+                    listPriority(Singleton.Instance.VisibleTasks);
+
                 }
-                listPriority(Singleton.Instance.VisibleTasks);
-               
+                return View(Singleton.Instance.VisibleTasks[0]);
             }
-            return View(Singleton.Instance.VisibleTasks[0]);
+            catch
+            {
+                Message("You have no tasks!");
+                return RedirectToAction(nameof(DeveloperTasks));
+            }
+            
+        }
+
+        public ActionResult Message(string message)
+        {
+            TempData["alertMessage"] = message;
+            return View();
         }
         // GET: TaskController/Create
         public ActionResult CreateTask()
@@ -313,7 +333,8 @@ namespace LAB4_Daneil_Elias_Diego_Ramirez.Controllers
                 Singleton.Instance.TaskIndex.insert(Task2, Task.Priority);
                 Singleton.Instance.heap.Add(node);
                 refreshAllTasks = true;
-              
+
+                Message("Task added to queue");
                 return RedirectToAction(nameof(DeveloperTasks));
             }
             catch
@@ -377,6 +398,7 @@ namespace LAB4_Daneil_Elias_Diego_Ramirez.Controllers
             var heap = Singleton.Instance.heap;
             var hashtable = Singleton.Instance.TaskHashtable;
 
+
             for (int i = 0; i < heap.elements.Count; i++)
             {
 
@@ -415,12 +437,27 @@ namespace LAB4_Daneil_Elias_Diego_Ramirez.Controllers
                             string key = heap.elements[i].Data.Title;
                             Singleton.Instance.heap.Delete(node);
                             Singleton.Instance.TaskHashtable.Remove(key);
+                            deleted = true;
+                            
 
 
                             break;
                         }
                     }
                 }
+                csvTasksHash = "";
+                TextWriter writer = new StreamWriter($"{hostingEnvironment.WebRootPath}\\csv\\tasks.csv");
+                for (int i = 0; i < heap.elements.Count; i++)
+                {
+                    string key = heap.elements[i].Data.Title;
+                    var Task = new Models.Data.Task();
+                    Task = hashtable.GetNode(key);
+                    csvTasksHash += $"{Task.Developer},{Task.Title},{Task.Description},{Task.Project},{Task.Priority},{Task.Date}\n";
+
+                }
+                writer.Write(csvTasksHash);
+                writer.Close();
+                Message("Task deleted");
                 return RedirectToAction(nameof(DeveloperTasks));
             }
             catch

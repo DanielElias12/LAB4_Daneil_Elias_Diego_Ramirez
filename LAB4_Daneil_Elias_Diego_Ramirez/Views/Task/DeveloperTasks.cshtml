@@ -18,3 +18,9 @@
 <div class="form-group">
     <input type="submit" value="Log Out" onclick="location.href='@Url.Action("Index", "Task")'" class="btn btn-outline-primary" />
 </div>
+@if (null != TempData["alertMessage"])
+{
+    <script type="text/javascript">
+       alert("@TempData["alertMessage"]");
+    </script>
+}

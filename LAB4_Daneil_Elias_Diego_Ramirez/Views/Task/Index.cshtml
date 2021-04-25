@@ -15,3 +15,11 @@
 <div class="form-group">
     <input type="submit" value="Manager Login" onclick="location.href='@Url.Action("ViewTaskManager", "Task")'" class="btn btn-outline-primary" />
 </div>
+
+@if (null != TempData["alertMessage"])
+{
+    <script type="text/javascript">
+       alert("@TempData["alertMessage"]");
+    </script>
+}
+
