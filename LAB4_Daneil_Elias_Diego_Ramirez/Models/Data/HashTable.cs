@@ -8,15 +8,15 @@ namespace LAB4_Daneil_Elias_Diego_Ramirez.Models.Data
     public class HashNode<T>
     {
         public HashNode<T> Next { get; set; }
-
-        public string Key { get; set; }
+       public HashNode<T> current { get; set;  }
+         public string Key { get; set; }
 
         public T Value { get; set; }
     }
     public class HashTable<T>
     {
         private readonly HashNode<T>[] buckets;
-
+        public HashNode<T> listNode;
         public HashTable(int size)
         {
             buckets = new HashNode<T>[size];
@@ -28,7 +28,7 @@ namespace LAB4_Daneil_Elias_Diego_Ramirez.Models.Data
 
             var valueNode = new HashNode<T> { Key = key, Value = item, Next = null };
             int position = GetBucketByKey(key);
-            HashNode<T> listNode = buckets[position];
+                listNode = buckets[position];
 
             if (null == listNode)
             {
@@ -65,15 +65,24 @@ namespace LAB4_Daneil_Elias_Diego_Ramirez.Models.Data
 
             if (null == current) return false;
 
-            if (null == previous)
+            if (null == previous && current.Next == null)
             {
                 buckets[position] = null;
                 return true;
             }
-            previous.Next = current.Next;
-            return true;
+            if (previous != null)
+            {
+                previous.Next = current.Next;
+                return true;
+            }
+            else
+            {
+                current = current.Next;
+                buckets[position] = current; 
+                return true; 
+            }
+  
         }
-
         public int GetBucketByKey(string key)
         {
             return key[0] % buckets.Length;
